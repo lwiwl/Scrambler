@@ -151,6 +151,14 @@ void EXT_Init()
 	VICIntEnable |= 1 << 16;
 }
 
+void LED_Init()
+{
+	PINSEL2 = PINSEL2 & ~(3<<2);
+	IO1DIR |= 0xff000000;
+	IO1SET |= 0xff000000;
+	IO1CLR |= (1<<25);
+}
+
 int main (void)
 {// add user source code
 	int i,j;
@@ -161,6 +169,8 @@ int main (void)
 	IO0DIR=0x7FFF;
 	UART0_Ini();
 	EXT_Init();
+	VICIntEnable |= 1 << 16;
+	//LED_Init();
 	isStart = FALSE;
 	isGet = FALSE;
 	UART0_SendStr("Please prepare for game!");
