@@ -162,7 +162,7 @@ InitStack
         LDR     SP, StackUnd
 ;Build the SYS stack
 ;设置系统模式堆栈
-        MSR     CPSR_c, #0xdf
+        MSR     CPSR_c, #0x5f
         LDR     SP, =StackUsr
 
         MOV     PC, R0
