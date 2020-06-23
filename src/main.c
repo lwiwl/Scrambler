@@ -88,26 +88,6 @@ void daojishi()
 	}
 }
 
-int whoget()
-{
-	if((IO0PIN&PLAYER1)==0)
-		return 1;
-	if((IO0PIN&PLAYER2)==0)
-		return 2;
-	if((IO0PIN&PLAYER3)==0)
-		return 3;
-	if((IO0PIN&PLAYER4)==0)
-		return 4;
-	if((IO0PIN&PLAYER5)==0)
-		return 5;
-	if((IO0PIN&PLAYER6)==0)
-		return 6;
-	if((IO0PIN&PLAYER7)==0)
-		return 7;
-	if((IO0PIN&PLAYER8)==0)
-		return 8;
-}
-
 int Who_Get()
 {
 	int i=0;
@@ -156,7 +136,17 @@ void LED_Init()
 	PINSEL2 = PINSEL2 & ~(3<<2);
 	IO1DIR |= 0xff000000;
 	IO1SET |= 0xff000000;
-	IO1CLR |= (1<<25);
+}
+
+void LED_Off()
+{
+	IO1SET |= 0xff000000;
+}
+
+void LED_On(int i)
+{
+	IO1SET |= 0xff000000;
+	IO1CLR |= (1<<(i+23));	//i is 1 to 8
 }
 
 int main (void)
@@ -184,11 +174,11 @@ int main (void)
 			UART0_SendStr("Please press the button to get the chance!");
 			VICIntEnable |= 1 << 17;		//Open
 			while(!isGet);
-			//i=whoget();
 			i = Who_Get();
 			IO0SET|=(display[i]<<2);
 			message[6]=i+'0';
 			UART0_SendStr(message);
+			//LED_On(i);
 			//答题时间，禁止操作
 			UART0_SendStr("please wait player's answer!");
 			for(j=0;j<20000000;j++);
@@ -197,6 +187,7 @@ int main (void)
 			isGet = FALSE;
 			VICIntEnable |= 1 << 16;		//Open
 		}
+		//LED_Off();
 	} 
 	return 0;
 }
