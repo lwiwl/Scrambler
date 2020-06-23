@@ -160,7 +160,7 @@ int main (void)
 	UART0_Ini();
 	EXT_Init();
 	VICIntEnable |= 1 << 16;
-	//LED_Init();
+	LED_Init();
 	isStart = FALSE;
 	isGet = FALSE;
 	UART0_SendStr("Please prepare for game!");
@@ -178,7 +178,7 @@ int main (void)
 			IO0SET|=(display[i]<<2);
 			message[6]=i+'0';
 			UART0_SendStr(message);
-			//LED_On(i);
+			LED_On(i);
 			//答题时间，禁止操作
 			UART0_SendStr("please wait player's answer!");
 			for(j=0;j<20000000;j++);
@@ -187,7 +187,7 @@ int main (void)
 			isGet = FALSE;
 			VICIntEnable |= 1 << 16;		//Open
 		}
-		//LED_Off();
+		LED_Off();
 	} 
 	return 0;
 }
