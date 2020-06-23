@@ -1,33 +1,20 @@
-/****************************************Copyright (c)**************************************************
-**                               Guangzou ZLG-MCU Development Co.,LTD.
-**                                      graduate school
-**                                 http://www.zlgmcu.com
-**
-**--------------File Info-------------------------------------------------------------------------------
-** File name:			main.c
-** Last modified Date:  2004-09-16
-** Last Version:		1.0
-** Descriptions:		The main() function example template
-**
-**------------------------------------------------------------------------------------------------------
-** Created by:			Chenmingji
-** Created date:		2004-09-16
-** Version:				1.0
-** Descriptions:		The original version
-**
-**------------------------------------------------------------------------------------------------------
-** Modified by:
-** Modified date:
-** Version:
-** Descriptions:
-**
-********************************************************************************************************/
+/*
+ * File: main.c
+ * Project: Scrambler
+ * Created Date: Tuesday June 23rd 2020
+ * Author: hong
+ * -----
+ * Last Modified: Tuesday, June 23rd 2020, 11:04:37 pm
+ * Modified By: wei
+ * -----
+ * Copyright (c) 2020 hong
+ */
 #include "config.h"
 
 #define UART_BPS 4800
 
 unsigned char display[]={0xc0,0xf9,0xa4,0xb0,
-0x99,0x92,0x82,0xf8,0x80};//¹²ÑôÊýÂë¹Ü0-8
+0x99,0x92,0x82,0xf8,0x80};//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0-8
 
 #define COMPERE (1<<15)
 #define PLAYER1 (1<<16)
@@ -121,8 +108,8 @@ void EXT_Init()
 	PINSEL1 |= 0x20000000;
 	PINSEL1 &= ~0x10000000;		//Set p0.30 EINT3
 	EXTMODE |= 12;
-	EXTPOLAR &= ~4;			//EINT2	ÏÂ½µÑØ´¥·¢
-	EXTPOLAR |= 8;			//EINT3	ÉÏ½µÑØ´¥·¢
+	EXTPOLAR &= ~4;			//EINT2	ï¿½Â½ï¿½ï¿½Ø´ï¿½ï¿½ï¿½
+	EXTPOLAR |= 8;			//EINT3	ï¿½Ï½ï¿½ï¿½Ø´ï¿½ï¿½ï¿½
 	VICIntSelect = 0;
 	VICVectAddr0 = (uint32)EINT2_ISR;
 	VICVectCntl0 = 0x20 | 16;
@@ -150,7 +137,7 @@ void LED_On(int i)
 }
 
 int main (void)
-{// add user source code
+{
 	int i,j;
 	
 	char message[]={"player  get the chance!"};
@@ -179,7 +166,7 @@ int main (void)
 			message[6]=i+'0';
 			UART0_SendStr(message);
 			LED_On(i);
-			//´ðÌâÊ±¼ä£¬½ûÖ¹²Ù×÷
+			//ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä£¬ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½
 			UART0_SendStr("please wait player's answer!");
 			for(j=0;j<20000000;j++);
 			UART0_SendStr("game is over,please wait we reset the game!");
@@ -191,6 +178,3 @@ int main (void)
 	} 
 	return 0;
 }
-/*********************************************************************************************************
-**                            End Of File
-********************************************************************************************************/
