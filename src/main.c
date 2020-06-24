@@ -14,7 +14,7 @@
 #define UART_BPS 4800
 
 unsigned char display[]={0xc0,0xf9,0xa4,0xb0,
-0x99,0x92,0x82,0xf8,0x80};//���������0-8
+0x99,0x92,0x82,0xf8,0x80};//共阳数码管0-8
 
 #define COMPERE (1<<15)
 #define PLAYER1 (1<<16)
@@ -25,6 +25,8 @@ unsigned char display[]={0xc0,0xf9,0xa4,0xb0,
 #define PLAYER6 (1<<21)
 #define PLAYER7 (1<<22)
 #define PLAYER8 (1<<23)
+
+#define COUNTDOWNTIME 3		//[0,9]
 
 volatile uint8 isStart;
 volatile uint8 isGet;
@@ -61,18 +63,22 @@ void UART0_SendStr(const char *str)
    	}
 }
 
-void daojishi()
+void Count_Down()
 {
-	int i,j;
+	int i;
 	char time[3]={" s"};
-	for(i=3;i>0;i--)
+	T0TCR = 1;	//Timer start
+	for(i=COUNTDOWNTIME;i>0;i--)
 	{
 		IO0CLR|=0x3FC;
 		IO0SET|=(display[i]<<2);
 		time[0]=i+'0';
 		UART0_SendStr(time);
-		for(j=0;j<3000000;j++);
+		while((T0IR & 1) == 0)
+			;
+		T0IR |= 1;	//Clear
 	}
+	T0TCR = 0;
 }
 
 int Who_Get()
@@ -108,8 +114,8 @@ void EXT_Init()
 	PINSEL1 |= 0x20000000;
 	PINSEL1 &= ~0x10000000;		//Set p0.30 EINT3
 	EXTMODE |= 12;
-	EXTPOLAR &= ~4;			//EINT2	�½��ش���
-	EXTPOLAR |= 8;			//EINT3	�Ͻ��ش���
+	EXTPOLAR &= ~4;			//EINT2	下降沿触发
+	EXTPOLAR |= 8;			//EINT3	上降沿触发
 	VICIntSelect = 0;
 	VICVectAddr0 = (uint32)EINT2_ISR;
 	VICVectCntl0 = 0x20 | 16;
@@ -136,6 +142,16 @@ void LED_On(int i)
 	IO1CLR |= (1<<(i+23));	//i is 1 to 8
 }
 
+void Timer_Init()
+{
+	T0TCR = 0;
+	T0PR = 0;
+	T0PC = 0;
+	T0TC = 0;
+	T0MR0 = Fosc - 1;	//1s
+	T0MCR = 0x03;
+}
+
 int main (void)
 {
 	int i,j;
@@ -147,6 +163,7 @@ int main (void)
 	UART0_Ini();
 	EXT_Init();
 	VICIntEnable |= 1 << 16;
+	Timer_Init();
 	LED_Init();
 	isStart = FALSE;
 	isGet = FALSE;
@@ -155,7 +172,7 @@ int main (void)
 	{
 		if(isStart)
 		{
-			daojishi();
+			Count_Down();
 			IO0CLR|=0x3FC;
 			UART0_SendStr("game start!");
 			UART0_SendStr("Please press the button to get the chance!");
@@ -166,7 +183,7 @@ int main (void)
 			message[6]=i+'0';
 			UART0_SendStr(message);
 			LED_On(i);
-			//����ʱ�䣬��ֹ����
+			//答题时间，禁止操作
 			UART0_SendStr("please wait player's answer!");
 			for(j=0;j<20000000;j++);
 			UART0_SendStr("game is over,please wait we reset the game!");
